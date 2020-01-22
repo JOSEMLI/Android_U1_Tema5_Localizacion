@@ -28,5 +28,15 @@
             android:layout_gravity="center"
             android:onClick="miubicacion"
             android:text="Ubicacion"/>
+        <Button
+            android:id="@+id/btnseguir"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/colorPrimaryDark"
+            android:textColor="#fff"
+            android:layout_gravity="center"
+            android:onClick="Seguir"
+            android:text="OFF seguir"/>
     </LinearLayout>
 </LinearLayout>

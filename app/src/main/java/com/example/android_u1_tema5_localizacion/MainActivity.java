@@ -3,10 +3,15 @@ package com.example.android_u1_tema5_localizacion;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -16,6 +21,16 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class MainActivity  extends AppCompatActivity implements OnMapReadyCallback {
   GoogleMap mapa;
+  //reemplazado
+//  @Override
+//  protected void onCreate(Bundle savedInstanceState) {
+//    super.onCreate(savedInstanceState);
+//    setContentView(R.layout.activity_main);
+//    SupportMapFragment mapFragment = (SupportMapFragment)
+//        getSupportFragmentManager().findFragmentById(R.id.mapa);
+//    mapFragment.getMapAsync(this);
+//  }
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -23,11 +38,42 @@ public class MainActivity  extends AppCompatActivity implements OnMapReadyCallba
     SupportMapFragment mapFragment = (SupportMapFragment)
         getSupportFragmentManager().findFragmentById(R.id.mapa);
     mapFragment.getMapAsync(this);
+    LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+    if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+      Toast.makeText(this, "GPS available", Toast.LENGTH_LONG).show();
+    } else {
+      Toast.makeText(this, "GPS not available", Toast.LENGTH_LONG).show();
+    }
+    LocationListener locationListener = new LocationListener() {
+      public void onLocationChanged(Location location) {
+        if (checkseguir == 1) {
+          Toast.makeText(getApplicationContext(), "Se cambio de posicion", Toast.LENGTH_SHORT).show();
+          Double latitude = location.getLatitude();
+          Double longitude = location.getLatitude();
+          Toast.makeText(getApplicationContext(), "latitud: " + latitude.toString() +
+              " longitud: " + longitude.toString(), Toast.LENGTH_SHORT).show();
+          if (mapa.getMyLocation() != null)
+            mapa.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                new LatLng(mapa.getMyLocation().getLatitude(),
+                    mapa.getMyLocation().getLongitude()), 15));
+        }
+      }
+      public void onStatusChanged(String provider, int status, Bundle extras) {
+      }
+      public void onProviderEnabled(String provider) {
+      }
+      public void onProviderDisabled(String provider) {
+      }
+    };
+     locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
   }
+
+  //se ejcuta automaticamente
   @Override
   public void onMapReady(GoogleMap googleMap) {
     mapa = googleMap;
     mapa.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(-18.013766, -70.255331), 15));
+
     if (ContextCompat.checkSelfPermission(this,
         android.Manifest.permission.ACCESS_FINE_LOCATION) ==
         PackageManager.PERMISSION_GRANTED) {
@@ -43,6 +89,22 @@ public class MainActivity  extends AppCompatActivity implements OnMapReadyCallba
     if (mapa.getMyLocation() != null)
       mapa.animateCamera(CameraUpdateFactory.newLatLngZoom(
           new LatLng(mapa.getMyLocation().getLatitude(),
+              //esta con raya por google tiene su prpa estategia
               mapa.getMyLocation().getLongitude()), 17));
+  }
+
+  int checkseguir=0;
+  public void Seguir(View view) {
+    Button btnseguir=findViewById(R.id.btnseguir);
+    if (checkseguir==0) {
+      checkseguir = 1;
+      btnseguir.setText("OFF seguir");
+      Toast.makeText(this, "Se Activo el seguimiento", Toast.LENGTH_SHORT).show();
+    }
+    else{
+      checkseguir = 0;
+      btnseguir.setText("ON seguir");
+      Toast.makeText(this, "Se desactivo el seguimiento", Toast.LENGTH_SHORT).show();
+    }
   }
 }
